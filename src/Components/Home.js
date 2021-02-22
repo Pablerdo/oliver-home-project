@@ -1,58 +1,98 @@
 import React from 'react';
 import '../Styles/Home.scss';
+import axios from 'axios';
+import {Grid, Header, Card, Rating} from 'semantic-ui-react'
+import Add from './Add.js'
 
 class Home extends React.Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      givenProduct: 0,
+      products: [],
+      loading: true,
+      reviews: [],
+    };
+    this.getReviews = this.getReviews.bind(this)
+  }
+
+  componentDidMount(){
+    this.getProducts()
+    this.getReviews()
+  }
+
+
+
+  async getProducts() {
+    const response = await axios.get('http://localhost:3004/products')
+    const { data } = await response
+    this.setState({
+      products: data,
+      loading: false,
+    })
+  }
+
+  async getReviews() {
+    const response = await axios.get('http://localhost:3004/reviews')
+    const { data } = await response
+
+    this.setState({
+      reviews: data
+    })
+  }
+
   render() {
+    
+    let {products, loading, givenProduct, reviews} = this.state;
+    if (loading) {
+      return (
+        <h1>Loading...</h1>
+      )
+    }
+
     return (
-        <div className="Home">
-          <img
-            src="https://res.cloudinary.com/hwery4evq/image/upload/c_scale,w_400/v1/assets/toast"
-            alt="welcome"/>
-          <h1>
-            Welcome!
-          </h1>
+        <Grid stackable style={{height: "100vh"}}>
+          <Grid.Column width={4} >
+            <Header style={{margin: 20, fontSize: 70}} >
+              Products
+            </Header>
+            {products.map(product => (
+              <Card style={{padding: 10, margin: 20, backgroundColor: parseInt(product.id) === givenProduct ? '#ffe82f' : 'white', border: '3px solid #262223'}} onClick={() => this.setState({givenProduct: product.id})}>
+                <Card.Content>
+                  <Card.Header style={{color: 'black', fontSize: 25}}>
+                    {product.name}
+                  </Card.Header>
+                </Card.Content>
+              </Card>
+            ))}
+          </Grid.Column>
 
-          <h2>
-            Oliver Space Take-Home Instructions
-          </h2>
-          <p>
-            Your mission, if you choose to accept it, is to build out a mock of a product reviews flow. 
-            This includes a page for users to submit their reviews as well as a page to read reviews.
-          </p>
-          <h3>Requirements</h3>
-          <ul>
-            <li>Create a page where a user can review a given product with the following information:</li>
-              <ul>
-                <li>Their name (the author)</li>
-                <li>A star rating</li>
-                <li>Headline text (a title for their review)</li>
-                <li>The body of the review (a longer paragraph)</li>
-              </ul>
-              <li>Create a page where a user can view all of the reviews for a given product</li>
-            </ul>
-          <p>
-            Please spend 90 minutes completing this task to whatever extent you can finish, but don't go over time. 
-            The expectation is not that you will get through all of the requirements, so please add notes on anything 
-            else you would have done with more time. Feel free to use any third-party libraries that you find helpful.
-          </p>
+          <Grid.Column width={11} style={{backgroundColor: '#fff', borderLeft: '4px solid #262223'}}>
+            <Header style={{margin: 20, fontSize: 70}} floated='left'>
+              Reviews 
+            </Header>
+            <Add givenProduct={givenProduct} floated='right' onSubmit={this.getReviews}/>
 
-          <h3>Running the App</h3>
-          <ul>
-            <li>Run <code>npm install</code> first</li>
-            <li>Start the mock JSON server on port 3004 using <code>json-server --watch db.json</code></li>
-            <li>Start the React app on port 3000 using <code>npm start</code></li>
-            <li>You can then make requests to <code>http://localhost:3004/products</code>, <code>http://localhost:3004/reviews</code> or <code>http://localhost:3004/products/:id/reviews</code> using axios, or any of your preferred methods</li>
-          </ul>
-          <p>More info on json-server <a href="https://www.npmjs.com/package/json-server">here</a></p>
+            {reviews.filter(review => parseInt(review.productId) === givenProduct).map(review => (
+              <Card fluid style={{paddingBottom: 10, marginLeft: 20, backgroundColor: '#ffe82f', border: '3px solid #262223'}} color={"#ffe82f"}>
+                <Card.Content>
+                  <Card.Header style={{fontSize: 45}}>
+                    {review.headline}
+                  </Card.Header>
+                  <Card.Meta style={{fontSize: 30, marginBottom: 10}}>
+                    {review.author}
+                  </Card.Meta>
+                  <Rating icon='heart' style={{marginBottom: 10}} disabled defaultRating={review.star_rating} maxRating={5} />
 
-          <p>This project was bootstrapped with <a href="https://github.com/facebook/create-react-app">Create React App</a></p>
-
-          <h4>
-            Best of luck! Feel free to email <a href="mailto:caroline@oliver.space">caroline@oliver.space</a>
-            or text (203) 434 - 2075 if you have any questions while you're completing the exercise. I'm
-            happy to help :)
-          </h4>
-        </div>
+                  <Card.Description style={{fontSize: 30, lineHeight: 1}}>
+                    {review.body}
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+            ))}
+          </Grid.Column>
+        </Grid>
       );
   }
 }

@@ -2,6 +2,7 @@
   text-align: center;
   max-width: 600px;
   margin: 24px auto 0;
+  font-family: "Assistant";
 }
 
 ul {
@@ -10,4 +11,13 @@ ul {
 
 code {
   background-color: #f4f5f6;
+}
+
+.ui.card {
+  border-radius: 0 !important;
+
+}
+
+.ui.button {
+  border-radius: 0 !important
 }

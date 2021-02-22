@@ -1,0 +1,6 @@
+1. - I went over the allowed time. By the time it was 90 minutes, I had very little to show. Sorry
+
+2. - In hindsight, I would have liked to put a placeholder text on the reviews page when there are no reviews posted.
+   - I would have added effects when posting a new review or switching between products.
+   - Maybe used react hooks for the home page.
+
